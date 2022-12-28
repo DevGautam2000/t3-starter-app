@@ -29,10 +29,8 @@ const Home: NextPage = () => {
       setItems((prev) => prev.filter((item) => item.id !== shoppingItem.id));
     },
   });
-  
-  const { mutate: checkItem } = trpc.shoppingList.checkItem.useMutation({});
 
-  
+  const { mutate: checkItem } = trpc.shoppingList.checkItem.useMutation({});
 
   return (
     <>
@@ -64,33 +62,43 @@ const Home: NextPage = () => {
           </button>
         </div>
 
-        {!itemsData || isLoading ?null: (<ul className="mt-4">
-          {items.map((currItem) => {
+        {!itemsData || isLoading ? null : (
+          <ul className="mt-4">
+            {items.map((currItem) => {
+              const { name, checked, id } = currItem;
+              return (
+                <li key={id} className="flex items-center justify-between p-1">
+                  <span
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setItems(() => [
+                        ...items.filter((item) => item.id !== id),
+                        { id, name, checked: !checked },
+                      ]);
+                      checkItem({ id, checked: !checked });
+                    }}
+                  >
+                    {checked ? (
+                      <span className="line-through decoration-red-600 transition duration-150 ease-in-out">
+                        {name}
+                      </span>
+                    ) : (
+                      <span>{name}</span>
+                    )}
+                  </span>
 
-          const { name, checked, id } = currItem
-            return <li 
-            
-            key={id} className="flex items-center justify-between p-1">
-             <span 
-             className="cursor-pointer"
-             onClick={()=>{
-              setItems( () => [...items.filter((item)=> item.id !== id),{id,name,checked:!checked}] )
-              checkItem({id,checked:!checked})
-             }}
-             >
-              {checked?<span className="line-through decoration-red-600 transition duration-150 ease-in-out">{name}</span>: <span>{name}</span>}
-              </span>
-
-              <button
-                type="button"
-                onClick={() => deleteItem({ id })}
-                className="h-6 w-6 rounded-full bg-gray-200 text-sm text-red-400 outline-none hover:bg-gray-100 active:scale-95"
-              >
-                X
-              </button>
-            </li>
-})}
-        </ul>)}
+                  <button
+                    type="button"
+                    onClick={() => deleteItem({ id })}
+                    className="h-6 w-6 rounded-full bg-gray-200 text-sm text-red-400 outline-none hover:bg-gray-100 active:scale-95"
+                  >
+                    X
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </main>
     </>
   );
